@@ -26,11 +26,10 @@ fn main() {
     for (i, section) in page.sections.iter().enumerate() {
         let cap = 3.min(section.len());
         if cap != 0 {
-        println!("= {:?} {}", item::MODULE_ITEM_KINDS[i], section.len());
-        for item in &section[0..cap] {
-            println!("{item:#?}");
-        }
+            println!("= {:?} {}", item::MODULE_ITEM_KINDS[i], section.len());
+            for item in &section[0..cap] {
+                println!("{item:#?}");
+            }
         }
     }
 }
-

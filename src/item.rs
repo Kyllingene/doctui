@@ -106,6 +106,7 @@ impl ModuleItemKind {
 }
 
 pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()] = [
+    AssociatedItemKind::ProvidedAssocConst,
     AssociatedItemKind::Variant,
     AssociatedItemKind::Method,
     AssociatedItemKind::AutoImplementation,
@@ -123,6 +124,7 @@ pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(usize)]
 pub enum AssociatedItemKind {
+    ProvidedAssocConst,
     Variant,
     Method,
     AutoImplementation,
@@ -149,22 +151,34 @@ impl AssociatedItemKind {
         }
 
         Some(match s.as_str() {
+            "provided-associated-constant" | "provided-associated-const" => {
+                Self::ProvidedAssocConst
+            }
             "variant" => Self::Variant,
-            "method" | "implementation" => Self::Method,
-            "auto trait implementation" | "synthetic-implementation" => Self::AutoImplementation,
-            "required-method" => Self::RequiredMethod,
-            "required-associated-type" => Self::RequiredAssocType,
-            "required-associated-constant" => Self::RequiredAssocConst,
-            "provided-method" => Self::ProvidedMethod,
-            "implementor" => Self::Implementor,
-            "trait-implementation" => Self::TraitImplementation,
-            "blanket-implementation" => Self::BlanketImplementation,
+            "method" | "implementation" | "implementations-list" => Self::Method,
+            "auto trait implementation"
+            | "synthetic-implementation"
+            | "synthetic-implementations-list" => Self::AutoImplementation,
+            "required-method" | "required-methods-list" => Self::RequiredMethod,
+            "required-associated-type" | "required-associated-types-list" => {
+                Self::RequiredAssocType
+            }
+            "required-associated-constant" | "required-associated-consts-list" => {
+                Self::RequiredAssocConst
+            }
+            "provided-method" | "provided-methods-list" => Self::ProvidedMethod,
+            "implementor" | "implementors-list" => Self::Implementor,
+            "trait-implementation" | "trait-implementations-list" => Self::TraitImplementation,
+            "blanket-implementation" | "blanket-implementations-list" => {
+                Self::BlanketImplementation
+            }
             _ => None?,
         })
     }
 
     pub fn to_keyword(&self) -> &'static str {
         match self {
+            Self::ProvidedAssocConst => "provided-assoc-const",
             Self::Variant => "variant",
             Self::Method => "implementation",
             Self::AutoImplementation => "synthetic-implementation",
@@ -181,6 +195,7 @@ impl AssociatedItemKind {
 
     pub fn to_human(&self) -> &'static str {
         match self {
+            Self::ProvidedAssocConst => "Provided Associated Constant",
             Self::Variant => "Variant",
             Self::Method => "Implementation",
             Self::AutoImplementation => "Auto Trait Implementation",

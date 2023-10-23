@@ -4,8 +4,8 @@ use scraper::Html;
 use thiserror::Error;
 
 pub mod all_page;
-pub mod crate_page;
 pub mod crate_item;
+pub mod crate_page;
 
 pub type ParseResult<T> = Result<T, ParseError>;
 

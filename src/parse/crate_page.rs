@@ -1,6 +1,6 @@
+use std::borrow::Cow;
 use std::path::Path;
 use std::sync::Arc;
-use std::borrow::Cow;
 
 use scraper::Html;
 
@@ -38,17 +38,9 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
         .text()
         .collect::<String>()
         .strip_prefix("Version ")
-        .ok_or_else(|| err!(
-            InvalidElement,
-            "version div",
-            Cow::Owned(version.html())
-        ))?
+        .ok_or_else(|| err!(InvalidElement, "version div", Cow::Owned(version.html())))?
         .split_once(|ch: char| ch.is_whitespace())
-        .ok_or_else(|| err!(
-            InvalidElement,
-            "version",
-            Cow::Owned(version.html())
-        ))?
+        .ok_or_else(|| err!(InvalidElement, "version", Cow::Owned(version.html())))?
         .0
         .to_string()
         .into();
@@ -61,10 +53,11 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
         .collect::<String>()
         .into();
 
-    let description = hierarchy!(content; r#"details[class="toggle top-doc"]"#, r#"div[class="docblock"]"#)?
-        .text()
-        .collect::<String>()
-        .into();
+    let description =
+        hierarchy!(content; r#"details[class="toggle top-doc"]"#, r#"div[class="docblock"]"#)?
+            .text()
+            .collect::<String>()
+            .into();
 
     let hs = s!(r#"h2[class="small-section-header"]"#);
     let headers = content.select(&hs);
@@ -76,14 +69,16 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
 
     for header in headers {
         let h = header.text().collect::<String>();
-        let header =
-            ModuleItemKind::parse(&h).ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(h)))?;
+        let header = ModuleItemKind::parse(&h)
+            .ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(h)))?;
 
-        let section = sections_list.next().ok_or_else(|| err!(
-            InvalidElement,
-            "HTML",
-            Cow::Borrowed("sections and headers are mismatched")
-        ))?;
+        let section = sections_list.next().ok_or_else(|| {
+            err!(
+                InvalidElement,
+                "HTML",
+                Cow::Borrowed("sections and headers are mismatched")
+            )
+        })?;
 
         let li = s!("li");
         let paths: Result<Vec<_>, _> = section
@@ -92,21 +87,14 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
                 let p = hierarchy!(li; r#"div[class="item-name"]"#, "a")?;
 
                 let href = p.value().attr("href").unwrap();
-                let title = p.value()
+                let title = p
+                    .value()
                     .attr("title")
-                    .ok_or_else(|| err!(
-                        InvalidElement,
-                        "link",
-                        Cow::Owned(p.html())
-                    ))?;
+                    .ok_or_else(|| err!(InvalidElement, "link", Cow::Owned(p.html())))?;
 
-                let (kind, rust_path) = title
-                    .split_once(" ")
-                    .ok_or_else(|| err!(
-                        InvalidElement,
-                        "link title",
-                        Cow::Owned(title.to_string())
-                    ))?;
+                let (kind, rust_path) = title.split_once(" ").ok_or_else(|| {
+                    err!(InvalidElement, "link title", Cow::Owned(title.to_string()))
+                })?;
 
                 // let kind = p.value()
                 //     .attr("class")
@@ -116,12 +104,9 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
                 //         Cow::Owned(p.html())
                 //     ))?;
 
-                let kind = ModuleItemKind::parse(kind)
-                    .ok_or_else(|| err!(
-                        InvalidElement,
-                        "item type",
-                        Cow::Owned(kind.to_string()),
-                    ))?;
+                let kind = ModuleItemKind::parse(kind).ok_or_else(|| {
+                    err!(InvalidElement, "item type", Cow::Owned(kind.to_string()),)
+                })?;
 
                 let description = hierarchy!(li; r#"div[class="desc docblock-short"]"#)?
                     .text()
@@ -129,11 +114,9 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
                     .into();
 
                 Ok(ModuleItem {
-                    href: Link::file(&Path::new(href)).ok_or_else(|| err!(
-                        InvalidElement,
-                        "link",
-                        Cow::Owned(href.to_string())
-                    ))?,
+                    href: Link::file(&Path::new(href)).ok_or_else(|| {
+                        err!(InvalidElement, "link", Cow::Owned(href.to_string()))
+                    })?,
                     rust_path: rust_path.into(),
 
                     kind,
@@ -147,9 +130,9 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
 
     if sections_list.next().is_some() {
         return Err(err!(
-                InvalidElement,
-                "HTML",
-                Cow::Borrowed("sections and headers are mismatched")
+            InvalidElement,
+            "HTML",
+            Cow::Borrowed("sections and headers are mismatched")
         ));
     }
 

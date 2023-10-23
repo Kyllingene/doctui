@@ -38,14 +38,16 @@ pub fn parse(page: &Html) -> ParseResult<Sections> {
 
     for header in headers {
         let h = header.text().collect::<String>();
-        let header =
-            ModuleItemKind::parse(&h).ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(h)))?;
+        let header = ModuleItemKind::parse(&h)
+            .ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(h)))?;
 
-        let section = sections_list.next().ok_or_else(|| err!(
-            InvalidElement,
-            "HTML",
-            Cow::Borrowed("sections and headers are mismatched")
-        ))?;
+        let section = sections_list.next().ok_or_else(|| {
+            err!(
+                InvalidElement,
+                "HTML",
+                Cow::Borrowed("sections and headers are mismatched")
+            )
+        })?;
 
         let li = s!("li");
         let paths: Result<Vec<_>, _> = section
@@ -58,11 +60,9 @@ pub fn parse(page: &Html) -> ParseResult<Sections> {
                 let rust_path = p.text().collect();
 
                 Ok(ModuleItem {
-                    href: Link::file(&Path::new(href)).ok_or_else(|| err!(
-                        InvalidElement,
-                        "link",
-                        Cow::Owned(href.to_string())
-                    ))?,
+                    href: Link::file(&Path::new(href)).ok_or_else(|| {
+                        err!(InvalidElement, "link", Cow::Owned(href.to_string()))
+                    })?,
                     rust_path,
                 })
             })
@@ -73,9 +73,9 @@ pub fn parse(page: &Html) -> ParseResult<Sections> {
 
     if sections_list.next().is_some() {
         return Err(err!(
-                InvalidElement,
-                "HTML",
-                Cow::Borrowed("sections and headers are mismatched")
+            InvalidElement,
+            "HTML",
+            Cow::Borrowed("sections and headers are mismatched")
         ));
     }
 
