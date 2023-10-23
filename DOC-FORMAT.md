@@ -59,9 +59,13 @@ There are a few idioms I am following; please follow them, or submit a PR changi
         - Description: `<details class="toggle top-doc" open="">...<div class="docblock>DESCRIPTION</div></details>`
     - Sections:
         - Section: `<h2 id="SECTION" class="SECTION? small-section-header">SECTION...</h2><div id="#SECTION-list"><details class="toggle #SECTION-toggle">`
-            - If Fields: Items:
+            - If variants: Items: `div class="variants"`
+                - Item: `<section id="variant.NAME" class="variant"><h3 class="code-header">VARIANT`
+                - If struct variant: Fields: `<div class="sub-variant" id="variant.NAME.fields">`
+                    - Field: `<div class="sub-variant-field"><span id="variant.NAME.field.NAME" class="small-section-header">...<code>NAME: FIELD</code></span></div>`
+            - If fields: Items:
                 - Item: `<span id="structfield.NAME" class="structfield small-section-header">...<code>NAME: TYPE</code></span>`
-            - If Impl: Items:
+            - If impl: Items:
                 - Item:
                     - Signature: `<summary><section id="ITEM_ID" class="KIND"><h3 class="code-header">SIGNATURE`
                     - Members: `div class="impl-items"`
@@ -80,6 +84,7 @@ Possible `id`s for items (verified by rg on std):
     - Trait Implementations: `trait-implementations`
     - Blanket Implementations: `blanket-implementations`
     - Methods from OTHERTYPE: `deref-methods-OTHERTYPE`
+    - Variants: `variants`
 
 Possible `KIND`s for items (verified by rg on std):
     - Struct field: `structfield`
@@ -95,10 +100,7 @@ Possible `KIND`s for items (verified by rg on std):
         - Crate name: `<h2 class="location"><a href="#">Crate NAME`
         - Sub-elements: `div class="sidebar-elems"`
             - List "header": `ul class="block"`
-                - Version: `li class="version"`
-            - `section`:
-                - Shortcuts:
-                    - `a href="#KIND"`
+                - Version: `<li class="version">`
     - **Main:** `<main><div class="width-limiter">`
         - **Content:** `section id="main-content" class="content"`
             - Crate name: `<div class="main-heading"><h1>Crate <a class="mod" href="#">NAME`

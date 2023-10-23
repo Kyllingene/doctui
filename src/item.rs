@@ -106,6 +106,7 @@ impl ModuleItemKind {
 }
 
 pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()] = [
+    AssociatedItemKind::Variant,
     AssociatedItemKind::Method,
     AssociatedItemKind::AutoImplementation,
     AssociatedItemKind::RequiredMethod,
@@ -122,6 +123,7 @@ pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(usize)]
 pub enum AssociatedItemKind {
+    Variant,
     Method,
     AutoImplementation,
     RequiredMethod,
@@ -147,17 +149,50 @@ impl AssociatedItemKind {
         }
 
         Some(match s.as_str() {
+            "variant" => Self::Variant,
             "method" | "implementation" => Self::Method,
             "auto trait implementation" | "synthetic-implementation" => Self::AutoImplementation,
             "required-method" => Self::RequiredMethod,
-            "required-associated-types" => Self::RequiredAssocType,
-            "required-associated-constants" => Self::RequiredAssocConst,
-            "provided-methods" => Self::ProvidedMethod,
-            "implementors" => Self::Implementor,
+            "required-associated-type" => Self::RequiredAssocType,
+            "required-associated-constant" => Self::RequiredAssocConst,
+            "provided-method" => Self::ProvidedMethod,
+            "implementor" => Self::Implementor,
             "trait-implementation" => Self::TraitImplementation,
             "blanket-implementation" => Self::BlanketImplementation,
             _ => None?,
         })
+    }
+
+    pub fn to_keyword(&self) -> &'static str {
+        match self {
+            Self::Variant => "variant",
+            Self::Method => "implementation",
+            Self::AutoImplementation => "synthetic-implementation",
+            Self::RequiredMethod => "required-method",
+            Self::RequiredAssocType => "required-associated-type",
+            Self::RequiredAssocConst => "required-associated-const",
+            Self::ProvidedMethod => "provided-method",
+            Self::Implementor => "implementor",
+            Self::TraitImplementation => "trait-implementation",
+            Self::BlanketImplementation => "blanket-implementation",
+            Self::DerefMethod => "deref-method",
+        }
+    }
+
+    pub fn to_human(&self) -> &'static str {
+        match self {
+            Self::Variant => "Variant",
+            Self::Method => "Implementation",
+            Self::AutoImplementation => "Auto Trait Implementation",
+            Self::RequiredMethod => "Required Method",
+            Self::RequiredAssocType => "Required Associated Type",
+            Self::RequiredAssocConst => "Required Associated Constant",
+            Self::ProvidedMethod => "Provided Method",
+            Self::Implementor => "Implementor",
+            Self::TraitImplementation => "Trait Implementation",
+            Self::BlanketImplementation => "Blanket Implementation",
+            Self::DerefMethod => "Methods from",
+        }
     }
 
     /// The number of associated item kinds.
