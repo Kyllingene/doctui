@@ -1,0 +1,13 @@
+[package]
+name = "doctui"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+errata = { version = "2.1.0", features = ["color"] }
+ratatui = "0.23.0"
+sarge = "4.0.2"
+scraper = "0.17.1"
+thiserror = "1.0.50"
