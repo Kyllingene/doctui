@@ -12,6 +12,7 @@ use crate::{err, hierarchy, s};
 pub type Sections = [Vec<AssociatedItem>; AssociatedItemKind::len()];
 
 pub enum AssociatedItem {
+    Declaration(Arc<str>),
     Method {
         name: Arc<str>,
         signature: Arc<str>,
@@ -109,7 +110,7 @@ pub fn parse(page: &Html) -> ParseResult<CrateItem> {
     let mut sections = Sections::default();
 
     for header in headers {
-        let kind = header
+        let section_kind = header
             .value()
             .attr("id")
             .map(|i| AssociatedItemKind::parse(i))
@@ -124,7 +125,31 @@ pub fn parse(page: &Html) -> ParseResult<CrateItem> {
             )
         })?;
 
-        sections[kind as usize] = todo!();
+        /* Possible associated item kinds by module item kind:
+         *  - Keyword: None
+         *  - Struct: 
+         *  - Enum: 
+         *  - Union: same as Struct
+         *  - Primitive: 
+         *  - Trait: 
+         *  - Macro: 
+         *  - Attr: 
+         *  - Derive: 
+         *  - Fn: 
+         *  - Typedef: 
+         *  - Const: 
+         * */
+
+        // Parse page for constants
+        if kind == ModuleItemKind::Constant {
+            let const_expr = hierarchy!(
+                main;
+                r#"pre class="rust item-decl""#,
+                "code"
+            )?.text().collect::<String>().into();
+
+            sections[AssociatedItemKind::Declaration as usize] = vec![AssociatedItem::Declaration(const_expr)];
+        }
     }
 
     if sections_list.next().is_some() {

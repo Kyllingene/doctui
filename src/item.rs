@@ -106,6 +106,7 @@ impl ModuleItemKind {
 }
 
 pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()] = [
+    AssociatedItemKind::Declaration,
     AssociatedItemKind::ProvidedAssocConst,
     AssociatedItemKind::Variant,
     AssociatedItemKind::Method,
@@ -124,6 +125,7 @@ pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(usize)]
 pub enum AssociatedItemKind {
+    Declaration,
     ProvidedAssocConst,
     Variant,
     Method,
@@ -151,6 +153,7 @@ impl AssociatedItemKind {
         }
 
         Some(match s.as_str() {
+            "declaration" | "item-decl" | "decl" => Self::Declaration,
             "provided-associated-constant" | "provided-associated-const" => {
                 Self::ProvidedAssocConst
             }
@@ -178,6 +181,7 @@ impl AssociatedItemKind {
 
     pub fn to_keyword(&self) -> &'static str {
         match self {
+            Self::Declaration => "item-decl",
             Self::ProvidedAssocConst => "provided-assoc-const",
             Self::Variant => "variant",
             Self::Method => "implementation",
@@ -195,6 +199,7 @@ impl AssociatedItemKind {
 
     pub fn to_human(&self) -> &'static str {
         match self {
+            Self::Declaration => "Item Declaration",
             Self::ProvidedAssocConst => "Provided Associated Constant",
             Self::Variant => "Variant",
             Self::Method => "Implementation",
