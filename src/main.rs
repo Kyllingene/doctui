@@ -22,5 +22,23 @@ fn main() {
     let html = Html::parse_document(&data);
 
     let page = parse::parse(&html).fail("failed to parse file");
-    println!("{page:#?}");
+
+    if let parse::Parsed::CrateItem(page) = page {
+        println!("=== {} {} ===", page.kind().to_human(), page.name());
+        if let Some(d) = page.description() {
+            println!("{}", d.normal());
+        }
+
+        println!("---");
+    } else if let parse::Parsed::CratePage(page) = page {
+        println!("=== Crate {} ===", page.name);
+        println!("Version {}", page.version);
+        println!("---\n");
+
+        if let Some(d) = page.description {
+            println!("{}", d.normal());
+        }
+
+        println!("---\n");
+    }
 }

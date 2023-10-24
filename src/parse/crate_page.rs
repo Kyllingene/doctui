@@ -8,7 +8,7 @@ use super::ParseResult;
 use crate::item::ModuleItemKind;
 use crate::link::Link;
 use crate::parse::style::Style;
-use crate::{err, hierarchy, s};
+use crate::{err, hierarchy, maybe, s};
 
 pub type Sections = [Vec<ModuleItem>; ModuleItemKind::len()];
 
@@ -18,7 +18,7 @@ pub struct ModuleItem {
     pub rust_path: Arc<str>,
 
     pub kind: ModuleItemKind,
-    pub description: Style,
+    pub description: Option<Style>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -26,7 +26,7 @@ pub struct Crate {
     pub name: Arc<str>,
     pub version: Arc<str>,
 
-    pub description: Style,
+    pub description: Option<Style>,
     pub sections: Sections,
 }
 
@@ -55,9 +55,13 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
         .collect::<String>()
         .into();
 
-    let description = Style::parse(
-        hierarchy!(content; r#"details[class="toggle top-doc"]"#, r#"div[class="docblock"]"#)?
-    ).map_err(|e| err!(InvalidElement, "link", Cow::Owned(e.to_string())))?;
+    let description = maybe!(
+        content;
+        r#"details[class="toggle top-doc"]"#,
+        r#"div[class="docblock"]"#
+    )
+    .map(|desc| Style::parse(desc))
+    .flatten();
 
     let hs = s!(r#"h2[class="small-section-header"]"#);
     let headers = content.select(&hs);
@@ -108,8 +112,9 @@ pub fn parse(page: &Html) -> ParseResult<Crate> {
                     err!(InvalidElement, "item type", Cow::Owned(kind.to_string()),)
                 })?;
 
-                let description = Style::parse(hierarchy!(li; r#"div[class="desc docblock-short"]"#)?)
-                    .map_err(|e| err!(InvalidElement, "link", Cow::Owned(e.to_string())))?;
+                let description = maybe!(li; r#"div[class="desc docblock-short"]"#)
+                    .map(|desc| Style::parse(desc))
+                    .flatten();
 
                 Ok(ModuleItem {
                     href: Link::file(&Path::new(href)).ok_or_else(|| {

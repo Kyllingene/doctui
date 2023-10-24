@@ -2,54 +2,42 @@ use std::sync::Arc;
 
 use scraper::Html;
 
-use super::ParseResult;
 use crate::parse::style::Style;
+use crate::parse::ParseResult;
 use crate::{hierarchy, maybe};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Constant {
+pub struct Keyword {
     pub name: Arc<str>,
-    pub definition: Style,
     pub description: Option<Style>,
 }
 
-pub fn parse(page: &Html) -> ParseResult<Constant> {
-    let body = hierarchy!(page; r#"body"#)?;
-
-    let main = hierarchy!(
-        body;
+pub fn parse(page: &Html) -> ParseResult<Keyword> {
+    let content = hierarchy!(
+        page;
+        "body",
         "main",
         r#"div[class="width-limiter"]"#,
         r#"section[id="main-content"]"#,
     )?;
 
     let name = hierarchy!(
-        main;
+        content;
+        r#"div[class="main-heading"]"#,
         "h1",
-        r##"a[href="#"]"##
+        r#"a[class="keyword"]"#,
     )?
     .text()
     .collect::<String>()
     .into();
 
     let description = maybe!(
-        main;
+        content;
         r#"details[class="toggle top-doc"]"#,
-        r#"div[class="docblock"]"#
+        r#"div[class="docblock"]"#,
     )
     .map(|desc| Style::parse(desc))
     .flatten();
 
-    let definition = Style::parse(hierarchy!(
-        main;
-        r#"pre[class="rust item-decl"]"#,
-        "code"
-    )?)
-    .unwrap_or_else(Style::new);
-
-    Ok(Constant {
-        name,
-        definition,
-        description,
-    })
+    Ok(Keyword { name, description })
 }

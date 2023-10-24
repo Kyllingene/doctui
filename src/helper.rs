@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! hierarchy {
-    ( $page:expr ; $selector1:expr $( , $selector:expr )* $(,)? ) => {(|| {
+    ( $page:expr ; $selector1:expr $( , $selector:expr )* $(,)? ) => {(|| -> Result<_, crate::parse::ParseError> {
         let data = $page.select(
             &scraper::Selector::parse($selector1).expect(&format!("failed to parse {}", $selector1))
         ).next().ok_or_else(|| crate::parse::ParseError::ElementNotFound($selector1, stringify!($page)))?;

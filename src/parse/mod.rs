@@ -4,8 +4,8 @@ use scraper::Html;
 use thiserror::Error;
 
 pub mod all_page;
-pub mod item;
 pub mod crate_page;
+pub mod item;
 pub mod style;
 
 pub type ParseResult<T> = Result<T, ParseError>;
@@ -35,4 +35,3 @@ pub fn parse(page: &Html) -> ParseResult<Parsed> {
         item::parse(page).map(|ci| Parsed::CrateItem(ci))
     }
 }
-
