@@ -1,1 +1,0 @@
-window.ALL_CRATES = ["errata","errata_macros","proc_macro2","quote","syn","t","unicode_ident"];
