@@ -6,6 +6,7 @@ mod helper;
 mod item;
 mod link;
 mod parse;
+mod prelude;
 
 pub type Str = std::borrow::Cow<'static, str>;
 

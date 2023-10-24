@@ -9,6 +9,7 @@ use crate::item::ModuleItemKind;
 mod constant;
 mod keyword;
 mod r#struct;
+mod impls;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CrateItem {

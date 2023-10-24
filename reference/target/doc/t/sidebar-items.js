@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["IHATEMYLIFE"],"enum":["Q"],"fn":["main"],"macro":["haha"],"struct":["T"],"trait":["F"],"type":["HAHAHAHAHAHAHA"],"union":["Z"]};
