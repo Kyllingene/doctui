@@ -43,6 +43,3 @@ macro_rules! haha {
     ( $bar:expr ) => {};
 }
 
-fn main() {
-    let a: bool = false;
-}
