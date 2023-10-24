@@ -4,15 +4,17 @@ use scraper::Html;
 use thiserror::Error;
 
 pub mod all_page;
-pub mod crate_item;
+pub mod item;
 pub mod crate_page;
+pub mod style;
 
 pub type ParseResult<T> = Result<T, ParseError>;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Parsed {
     AllPage(all_page::Sections),
     CratePage(crate_page::Crate),
-    CrateItem(crate_item::CrateItem),
+    CrateItem(item::CrateItem),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
@@ -30,6 +32,7 @@ pub fn parse(page: &Html) -> ParseResult<Parsed> {
     } else if let Ok(cp) = crate_page::parse(page) {
         Ok(Parsed::CratePage(cp))
     } else {
-        crate_item::parse(page).map(|ci| Parsed::CrateItem(ci))
+        item::parse(page).map(|ci| Parsed::CrateItem(ci))
     }
 }
+

@@ -18,6 +18,25 @@ macro_rules! hierarchy {
 }
 
 #[macro_export]
+macro_rules! maybe {
+    ( $page:expr ; $selector1:expr $( , $selector:expr )* $(,)? ) => {(|| {
+        let data = $page.select(
+            &scraper::Selector::parse($selector1).expect(&format!("failed to parse {}", $selector1))
+        ).next()?;
+        let _prev = $selector1;
+
+        $(
+            let data = data.select(
+                &scraper::Selector::parse($selector).expect(&format!("failed to parse {}", $selector))
+            ).next()?;
+            let _prev = $selector;
+        )*
+
+        Some(data)
+    })()}
+}
+
+#[macro_export]
 macro_rules! s {
     ( $selector:expr ) => {
         scraper::Selector::parse($selector).expect(&format!("failed to parse {}", $selector))
