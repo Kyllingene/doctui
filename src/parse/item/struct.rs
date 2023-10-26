@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use scraper::Html;
 
+use super::impls::{self, Impl};
 use crate::item::AssociatedItemKind;
 use crate::parse::style::{Style, StyleModifier};
 use crate::parse::ParseResult;
@@ -15,11 +16,11 @@ pub struct Field {
     pub description: Option<Style>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Impl {
-    pub signature: Style,
-    pub members: Vec<Member>,
-}
+// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+// pub struct Impl {
+//     pub signature: Style,
+//     pub members: Vec<Member>,
+// }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Member {
@@ -128,24 +129,13 @@ pub fn parse(page: &Html) -> ParseResult<Struct> {
         });
     }
 
-    for header in headers {
-        let kind = header
-            .value()
-            .attr("id")
-            .ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(header.html())))?;
-        let kind = AssociatedItemKind::parse(kind)
-            .ok_or_else(|| err!(InvalidElement, "header", Cow::Owned(header.html())))?;
-
-        if kind == AssociatedItemKind::Field {
-            continue;
-        }
-    }
+    let impls = impls::parse_all(content)?;
 
     Ok(Struct {
         name,
         description,
 
         fields,
-        impls: todo!(),
+        impls,
     })
 }

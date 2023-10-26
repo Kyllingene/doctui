@@ -30,16 +30,25 @@ fn main() {
             println!("{}", d.normal());
         }
 
-        println!("---");
-    } else if let parse::Parsed::CratePage(page) = page {
-        println!("=== Crate {} ===", page.name);
-        println!("Version {}", page.version);
-        println!("---\n");
+        println!("#####");
+        if let Some(impls) = page.impls() {
+            for im in impls {
+                println!("{}\n***", im.signature.normal());
 
-        if let Some(d) = page.description {
-            println!("{}", d.normal());
+                for member in im.members {
+                    println!("{} {}", member.kind.to_human(), member.name);
+                    if let Some(desc) = member.description {
+                        println!("{}", desc.normal());
+                    }
+                    if let Some(def) = member.definition {
+                        println!("{}", def.normal());
+                    }
+
+                    println!("--");
+                }
+
+                println!("###");
+            }
         }
-
-        println!("---\n");
     }
 }

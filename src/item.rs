@@ -119,6 +119,7 @@ pub const ASSOCIATED_ITEM_KINDS: [AssociatedItemKind; AssociatedItemKind::len()]
     AssociatedItemKind::Implementor,
     AssociatedItemKind::TraitImplementation,
     AssociatedItemKind::BlanketImplementation,
+    AssociatedItemKind::AssocConstant,
     AssociatedItemKind::DerefMethod,
 ];
 
@@ -139,6 +140,7 @@ pub enum AssociatedItemKind {
     Implementor,
     TraitImplementation,
     BlanketImplementation,
+    AssocConstant,
     DerefMethod,
 }
 
@@ -197,6 +199,7 @@ impl AssociatedItemKind {
             Self::Implementor => "implementor",
             Self::TraitImplementation => "trait-implementation",
             Self::BlanketImplementation => "blanket-implementation",
+            Self::AssocConstant => "associatedconstant",
             Self::DerefMethod => "deref-method",
         }
     }
@@ -207,7 +210,7 @@ impl AssociatedItemKind {
             Self::Declaration => "Item Declaration",
             Self::ProvidedAssocConst => "Provided Associated Constant",
             Self::Variant => "Variant",
-            Self::Method => "Implementation",
+            Self::Method => "Method",
             Self::AutoImplementation => "Auto Trait Implementation",
             Self::RequiredMethod => "Required Method",
             Self::RequiredAssocType => "Required Associated Type",
@@ -216,6 +219,7 @@ impl AssociatedItemKind {
             Self::Implementor => "Implementor",
             Self::TraitImplementation => "Trait Implementation",
             Self::BlanketImplementation => "Blanket Implementation",
+            Self::AssocConstant => "Associated Constant",
             Self::DerefMethod => "Methods from",
         }
     }

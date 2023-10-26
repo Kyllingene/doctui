@@ -9,7 +9,7 @@ use crate::Str;
 
 /// A `Vec` of [`StyleModifier`] representing styled text.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Style(Vec<StyleModifier>);
+pub struct Style(pub Vec<StyleModifier>);
 
 impl Style {
     /// Returns an empty style.
