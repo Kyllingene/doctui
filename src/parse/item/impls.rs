@@ -15,7 +15,6 @@ pub struct Member {
 }
 
 pub fn parse_all(content: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
-    let hs = s!("h2");
     let ss = s!("div");
     let sections = content.select(&ss).filter_map(|s| {
         s.value()
@@ -81,7 +80,9 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
         let mut member_description = None;
         let mut member_definition = None;
         let mut last = None;
-        for child in im.children() {
+
+        let children = hierarchy!(im; r#"div[class="impl-items"]"#)?.children();
+        for child in children {
             if let Some(child) = ElementRef::wrap(child) {
                 match (child.value().name(), child.value().attr("class")) {
                     ("summary", _) => {
@@ -110,7 +111,7 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                     ("div", Some("docblock")) => {
                         member_description = Style::parse(child);
                     }
-                    ("details", Some("toggle method-toggle")) => {
+                    ("details", Some("toggle method-toggle" | "toggle")) => {
                         if let Some(name) = member_name.take() {
                             let kind = member_kind.take().unwrap_or(AssociatedItemKind::Method);
                             members.push(Member {
@@ -121,15 +122,26 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                             });
                         }
 
-                        let name = hierarchy!(
+                        let def = hierarchy!(
                             child;
                             "summary",
                             r#"h4[class="code-header"]"#,
-                            "a",
-                        )?
-                        .text()
-                        .collect::<String>()
-                        .into();
+                        )?;
+
+                        let name = hierarchy!(def; "a")?;
+                        if let Some(mut args) = Style::parse(def) {
+                            if args.len() > 1 {
+                                args.drain(0..2);
+                                member_definition = Some(args);
+                            }
+                        }
+
+                        member_kind = name
+                            .value()
+                            .attr("class")
+                            .map(|c| AssociatedItemKind::parse(c))
+                            .flatten();
+                        let name = name.text().collect::<String>().into();
 
                         member_name = Some(name);
 
@@ -150,18 +162,24 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                             });
                         }
 
-                        let name = hierarchy!(
+                        let def = hierarchy!(
                             child;
                             r#"h4[class="code-header"]"#,
-                            "a",
-                        )?
-                        .text()
-                        .collect::<String>()
-                        .into();
+                        )?;
 
+                        let name = hierarchy!(def; "a")?.text().collect::<String>().into();
                         member_name = Some(name);
+
+                        if let Some(mut args) = Style::parse(def) {
+                            if args.len() > 1 {
+                                args.drain(0..2);
+                                member_definition = Some(args);
+                            }
+                        }
                     }
-                    _ => {}
+                    _ => {
+                        println!("warning: unparsed element: {}", child.html());
+                    }
                 }
 
                 last = Some(child);

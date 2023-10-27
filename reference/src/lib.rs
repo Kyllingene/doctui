@@ -28,7 +28,7 @@ impl T {
     const D: u8 = 2;
 
     /// DOCUMENTATION 5
-    fn somefun() {}
+    fn somefun(a: u8) { drop(a) }
     fn otherfun() {}
 }
 

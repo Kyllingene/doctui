@@ -40,6 +40,7 @@ fn main() {
                     if let Some(desc) = member.description {
                         println!("{}", desc.normal());
                     }
+
                     if let Some(def) = member.definition {
                         println!("{}", def.normal());
                     }
