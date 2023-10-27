@@ -79,8 +79,6 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
         let mut member_kind = None;
         let mut member_description = None;
         let mut member_definition = None;
-        let mut last = None;
-
         let children = hierarchy!(im; r#"div[class="impl-items"]"#)?.children();
         for child in children {
             if let Some(child) = ElementRef::wrap(child) {
@@ -181,8 +179,6 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                         println!("warning: unparsed element: {}", child.html());
                     }
                 }
-
-                last = Some(child);
             }
         }
 
