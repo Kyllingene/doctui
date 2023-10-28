@@ -1,4 +1,6 @@
-# Rust HTML Documentation Format
+# Rust HTML Documentation Format (Deprecated)
+
+***Note:*** This document is the very first iteration. It came before I realized the extent of detail in the structure. This is left here, for now, as a temporary reference. Once all the information from here is represented elsewhere, this will be removed.
 
 ## How this document is formatted
 

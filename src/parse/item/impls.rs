@@ -106,9 +106,9 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
 
                         member_name = Some(name);
                     }
-                    ("div", Some("docblock")) => {
-                        member_description = Style::parse(child);
-                    }
+                    // ("div", Some("docblock")) => {
+                    //     member_description = Style::parse(child);
+                    // }
                     ("details", Some("toggle method-toggle" | "toggle")) => {
                         if let Some(name) = member_name.take() {
                             let kind = member_kind.take().unwrap_or(AssociatedItemKind::Method);

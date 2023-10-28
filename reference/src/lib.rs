@@ -1,33 +1,33 @@
 type HAHAHAHAHAHAHA = u8;
 const IHATEMYLIFE: HAHAHAHAHAHAHA = 0xdeadbeef;
 
-/// DOCUMENTATION 18
+/// F docs
 trait F {
-    /// DOCUMENTATION 19
+    /// F::B docs
     type B;
-    /// DOCUMENTATION 20
+    /// F::C docs
     const C: u8;
 
-    /// DOCUMENTATION 21
+    /// F::DEF docs
     const DEF: u8 = 123;
 
-    /// DOCUMENTATION 22
+    /// F::foobar docs
     fn foobar() {}
 }
 
-/// DOCUMENTATION 1
+/// T docs
 struct T {
-    /// DOCUMENTATION 2
+    /// T.asdf docs
     asdf: u8,
     ghjk: f32,
 }
 
-/// DOCUMENTATION 3
+/// impl T (1) docs
 impl T {
-    /// DOCUMENTATION 4
+    /// T::D docs
     const D: u8 = 2;
 
-    /// DOCUMENTATION 5
+    /// T::somefun docs
     fn somefun(a: u8) { drop(a) }
     fn otherfun() {}
 }
@@ -36,39 +36,39 @@ impl T {
     fn yetanother() {}
 }
 
-/// DOCUMENTATION 6
+/// impl F for T docs
 impl F for T {
-    /// DOCUMENTATION 7
+    /// T(F)::B docs
     type B = u8;
-    /// DOCUMENTATION 8
+    /// T(F)::C docs
     const C: u8 = 1;
 }
 
-/// DOCUMENTATION 9
+/// Z docs
 union Z {
-    /// DOCUMENTATION 10
+    /// Z.x docs
     x: f32,
-    /// DOCUMENTATION 11
+    /// Z.y docs
     y: i32,
 }
 
-/// DOCUMENTATION 12
+/// Q docs
 enum Q {
-    /// DOCUMENTATION 13
+    /// Q::A docs
     A,
-    /// DOCUMENTATION 14
+    /// Q::B docs
     B(u8, f32),
-    /// DOCUMENTATION 15
+    /// Q::C docs
     C { d: u8, e: f32 }
 }
 
-/// DOCUMENTATION 16
+/// haha docs
 macro_rules! haha {
     ( $foo:expr ) => {};
     ( $bar:expr ) => {};
 }
 
-/// DOCUMENTATION 17
+/// foobarfoobar docs
 pub fn foobarfoobar(
     f: u8,
     g: u8
