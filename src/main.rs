@@ -10,8 +10,6 @@ mod prelude;
 
 pub type Str = std::borrow::Cow<'static, str>;
 
-// TODO: properly parse all sub-HTML such as bold, links, etc.
-
 #[errata::catch]
 fn main() {
     let parser = ArgumentParser::new();
@@ -33,7 +31,8 @@ fn main() {
         println!("#####");
         if let Some(impls) = page.impls() {
             for im in impls {
-                println!("{}\n***", im.signature.normal());
+                let sig = im.signature.normal();
+                println!("{sig}\n***");
 
                 for member in im.members {
                     println!("{} {}", member.kind.to_human(), member.name);

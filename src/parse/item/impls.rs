@@ -39,10 +39,13 @@ pub fn parse_one(im: ElementRef<'_>, kind: AssociatedItemKind) -> Option<ParseRe
     type AIK = AssociatedItemKind;
     Some(match kind {
         AIK::Method => parse_methods(im),
-        AIK::AutoImplementation => parse_autoimps(im),
+        AIK::AutoImplementation => parse_methods(im),
         AIK::Implementor => parse_implementors(im),
-        AIK::TraitImplementation => parse_traits(im),
-        AIK::BlanketImplementation => parse_blanket(im),
+        // AIK::TraitImplementation => parse_traits(im), TODO: should these be separate?
+        // AIK::BlanketImplementation => parse_blanket(im),
+        // AIK::AutoImplementation => parse_autoimps(im),
+        AIK::TraitImplementation => parse_methods(im),
+        AIK::BlanketImplementation => parse_methods(im),
         AIK::RequiredMethod => parse_reqmeth(im),
         AIK::RequiredAssocType => parse_reqtyp(im),
         AIK::RequiredAssocConst => parse_reqconst(im),
