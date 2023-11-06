@@ -36,19 +36,23 @@ pub fn parse_all(content: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
 }
 
 pub fn parse_one(im: ElementRef<'_>, kind: AssociatedItemKind) -> Option<ParseResult<Vec<Impl>>> {
+    return Some(parse_methods(im));
     type AIK = AssociatedItemKind;
     Some(match kind {
         AIK::Method => parse_methods(im),
-        AIK::AutoImplementation => parse_methods(im),
         AIK::Implementor => parse_implementors(im),
         // AIK::TraitImplementation => parse_traits(im), TODO: should these be separate?
         // AIK::BlanketImplementation => parse_blanket(im),
         // AIK::AutoImplementation => parse_autoimps(im),
+        AIK::AutoImplementation => parse_methods(im),
         AIK::TraitImplementation => parse_methods(im),
         AIK::BlanketImplementation => parse_methods(im),
-        AIK::RequiredMethod => parse_reqmeth(im),
-        AIK::RequiredAssocType => parse_reqtyp(im),
-        AIK::RequiredAssocConst => parse_reqconst(im),
+        // AIK::RequiredMethod => parse_reqmeth(im),
+        // AIK::RequiredAssocType => parse_reqtyp(im),
+        // AIK::RequiredAssocConst => parse_reqconst(im),
+        AIK::RequiredMethod => parse_methods(im),
+        AIK::RequiredAssocType => parse_methods(im),
+        AIK::RequiredAssocConst => parse_methods(im),
         AIK::DerefMethod => parse_deref(im),
         AIK::ProvidedMethod => parse_provided(im),
         AIK::Variant => parse_variants(im),
@@ -140,8 +144,7 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                         member_kind = name
                             .value()
                             .attr("class")
-                            .map(|c| AssociatedItemKind::parse(c))
-                            .flatten();
+                            .and_then(|c| AssociatedItemKind::parse(c));
                         let name = name.text().collect::<String>().into();
 
                         member_name = Some(name);
@@ -152,7 +155,8 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
                         )?;
                         member_description = Style::parse(desc);
                     }
-                    ("section", Some("method")) => {
+                    // ("section", Some("method")) => {
+                    ("section", class) => {
                         if let Some(name) = member_name.take() {
                             let kind = member_kind.take().unwrap_or(AssociatedItemKind::Method);
                             members.push(Member {
@@ -170,6 +174,9 @@ fn parse_methods(im: ElementRef<'_>) -> ParseResult<Vec<Impl>> {
 
                         let name = hierarchy!(def; "a")?.text().collect::<String>().into();
                         member_name = Some(name);
+
+                        member_kind = class
+                            .and_then(|c| AssociatedItemKind::parse(c));
 
                         if let Some(mut args) = Style::parse(def) {
                             if args.len() > 1 {

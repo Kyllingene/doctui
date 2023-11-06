@@ -134,12 +134,12 @@ impl StyleModifier {
                 .collect::<String>()
                 .into(),
 
-            StyleModifier::Other(s) => (" ".to_string() + s
-                .iter()
-                .map(|s| s.normal().to_string())
-                .collect::<String>()
-                .as_str()
-            ).into(),
+            StyleModifier::Other(s) => (" ".to_string()
+                + s.iter()
+                    .map(|s| s.normal().to_string())
+                    .collect::<String>()
+                    .as_str())
+            .into(),
 
             StyleModifier::Pre(s) => {
                 let mut out = String::new();

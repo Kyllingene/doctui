@@ -1,4 +1,4 @@
-# Inherent Implementation Structure Documentation
+# Implementation Block Structure Documentation
 
 ## HTML Reference
 

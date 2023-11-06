@@ -39,28 +39,31 @@ impl ModuleItemKind {
     /// Parse a module item kind from either human-readable form
     /// (e.g. `Primitive Type`) or keyword form (e.g. `primitive`).
     pub fn parse(mut s: &str) -> Option<Self> {
-        if s.ends_with('s') {
-            s = &s[0..s.len() - 1];
+        let s = s.to_lowercase();
+        for mut kind in s.split_whitespace() {
+            if kind.ends_with('s') {
+                kind = &kind[0..kind.len() - 1];
+            }
+
+            if let Some(kind) = Some(match kind {
+                "module" | "mod" => Self::Module,
+                "keyword" => Self::Keyword,
+                "struct" => Self::Struct,
+                "enum" => Self::Enum,
+                "union" => Self::Union,
+                "primitive type" | "primitive" => Self::PrimitiveType,
+                "trait" => Self::Trait,
+                "macro" => Self::Macro,
+                "attribute macro" | "attr" => Self::AttributeMacro,
+                "derive macro" | "derive" => Self::DeriveMacro,
+                "function" | "fn" => Self::Function,
+                "type definition" | "type" => Self::TypeDefinition,
+                "constant" => Self::Constant,
+                _ => None?,
+            }) { return Some(kind); }
         }
 
-        let s = s.to_lowercase();
-
-        Some(match s.as_str() {
-            "module" | "mod" => Self::Module,
-            "keyword" => Self::Keyword,
-            "struct" => Self::Struct,
-            "enum" => Self::Enum,
-            "union" => Self::Union,
-            "primitive type" | "primitive" => Self::PrimitiveType,
-            "trait" => Self::Trait,
-            "macro" => Self::Macro,
-            "attribute macro" | "attr" => Self::AttributeMacro,
-            "derive macro" | "derive" => Self::DeriveMacro,
-            "function" | "fn" => Self::Function,
-            "type definition" | "type" => Self::TypeDefinition,
-            "constant" => Self::Constant,
-            _ => None?,
-        })
+        None
     }
 
     pub fn to_keyword(&self) -> &'static str {
@@ -148,43 +151,42 @@ pub enum AssociatedItemKind {
 
 impl AssociatedItemKind {
     pub fn parse(mut s: &str) -> Option<Self> {
-        if s.ends_with('s') {
-            s = &s[0..s.len() - 1];
+        let s = s.to_lowercase();
+        for mut kind in s.split_whitespace() {
+            if kind.ends_with('s') {
+                kind = &kind[0..kind.len() - 1];
+            }
+
+            if let Some(kind) = Some(match kind {
+                "const" | "constant" => Self::Constant,
+                "field" | "structfield" => Self::Field,
+                "declaration" | "item-decl" | "decl" => Self::Declaration,
+                "provided-associated-constant" | "provided-associated-const" => {
+                    Self::ProvidedAssocConst
+                }
+                "variant" => Self::Variant,
+                "method" | "implementation" | "implementations-list" => Self::Method,
+                "auto trait implementation"
+                | "synthetic-implementation"
+                | "synthetic-implementations-list" => Self::AutoImplementation,
+                "required-method" | "required-methods-list" => Self::RequiredMethod,
+                "required-associated-type" | "required-associated-types-list" => {
+                    Self::RequiredAssocType
+                }
+                "required-associated-constant" | "required-associated-consts-list" => {
+                    Self::RequiredAssocConst
+                }
+                "provided-method" | "provided-methods-list" => Self::ProvidedMethod,
+                "implementor" | "implementors-list" => Self::Implementor,
+                "trait-implementation" | "trait-implementations-list" => Self::TraitImplementation,
+                "blanket-implementation" | "blanket-implementations-list" => {
+                    Self::BlanketImplementation
+                }
+                _ => None?,
+            }) { return Some(kind); }
         }
 
-        let s = s.to_lowercase().replace(' ', "-");
-
-        if s.starts_with("methods-from") || s.starts_with("deref-methods-") {
-            return Some(Self::DerefMethod);
-        }
-
-        Some(match s.as_str() {
-            "const" | "constant" => Self::Constant,
-            "field" | "structfield" => Self::Field,
-            "declaration" | "item-decl" | "decl" => Self::Declaration,
-            "provided-associated-constant" | "provided-associated-const" => {
-                Self::ProvidedAssocConst
-            }
-            "variant" => Self::Variant,
-            "method" | "implementation" | "implementations-list" => Self::Method,
-            "auto trait implementation"
-            | "synthetic-implementation"
-            | "synthetic-implementations-list" => Self::AutoImplementation,
-            "required-method" | "required-methods-list" => Self::RequiredMethod,
-            "required-associated-type" | "required-associated-types-list" => {
-                Self::RequiredAssocType
-            }
-            "required-associated-constant" | "required-associated-consts-list" => {
-                Self::RequiredAssocConst
-            }
-            "provided-method" | "provided-methods-list" => Self::ProvidedMethod,
-            "implementor" | "implementors-list" => Self::Implementor,
-            "trait-implementation" | "trait-implementations-list" => Self::TraitImplementation,
-            "blanket-implementation" | "blanket-implementations-list" => {
-                Self::BlanketImplementation
-            }
-            _ => None?,
-        })
+        None
     }
 
     pub fn to_keyword(&self) -> &'static str {
