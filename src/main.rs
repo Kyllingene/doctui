@@ -1,54 +1,42 @@
-use errata::FallibleExt;
+use errata::{FallibleExt, error};
 use sarge::prelude::*;
-use scraper::Html;
+use dirs::data_dir;
 
+mod backends;
+pub use backends::parse; // TODO: refactor this out
 mod helper;
 mod item;
 mod link;
-mod parse;
 mod prelude;
+mod style;
 
 pub type Str = std::borrow::Cow<'static, str>;
 
 #[errata::catch]
 fn main() {
     let parser = ArgumentParser::new();
+    let backend = parser.add(tag::both('b', "backend"));
 
     let files = parser.parse().fail("failed to parse arguments");
-
     let file = files.get(0).fail("you must specify a file");
-    let data = std::fs::read_to_string(&file).fail("failed to read file");
-    let html = Html::parse_document(&data);
+    
+    let mut data_dir = data_dir().unwrap_or_else(|| "./doctui".into());
+    data_dir.push("doctui");
+    std::fs::create_dir_all(&data_dir).fail("failed to create data directory");
 
-    let page = parse::parse(&html).fail("failed to parse file");
-
-    if let parse::Parsed::CrateItem(page) = page {
-        println!("=== {} {} ===", page.kind().to_human(), page.name());
-        if let Some(d) = page.description() {
-            println!("{}", d.normal());
+    let docs_path = match backend.get().unwrap_or_else(|_| "json".to_string()).as_str() {
+        "html" => error!("parsing backend not yet complete"),
+        "json" => {
+            rustdoc_json::Builder::default()
+                .toolchain("nightly")
+                .target_dir(&data_dir)
+                .all_features(true)
+                .manifest_path(file)
+                .build()
+                .fail("failed to generate JSON documentation")
         }
+        back => error!("invalid backend: `{back}`"),
+    };
 
-        println!("#####");
-        if let Some(impls) = page.impls() {
-            for im in impls {
-                let sig = im.signature.normal();
-                println!("{sig}\n***");
-
-                for member in im.members {
-                    println!("{} {}", member.kind.to_human(), member.name);
-                    if let Some(desc) = member.description {
-                        println!("{}", desc.normal());
-                    }
-
-                    if let Some(def) = member.definition {
-                        println!("{}", def.normal());
-                    }
-
-                    println!("--");
-                }
-
-                println!("###");
-            }
-        }
-    }
+    println!("{}", docs_path.display());
 }

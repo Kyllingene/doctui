@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use scraper::Html;
 
-use crate::parse::style::Style;
+use crate::style::Style;
 use crate::parse::ParseResult;
 use crate::{hierarchy, maybe};
 

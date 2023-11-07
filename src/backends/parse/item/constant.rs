@@ -3,7 +3,7 @@ use std::sync::Arc;
 use scraper::Html;
 
 use super::ParseResult;
-use crate::parse::style::Style;
+use crate::style::Style;
 use crate::{hierarchy, maybe};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

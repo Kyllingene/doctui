@@ -7,7 +7,7 @@ use scraper::Html;
 use super::ParseResult;
 use crate::item::ModuleItemKind;
 use crate::link::Link;
-use crate::parse::style::Style;
+use crate::style::Style;
 use crate::{err, hierarchy, maybe, s};
 
 pub type Sections = [Vec<ModuleItem>; ModuleItemKind::len()];

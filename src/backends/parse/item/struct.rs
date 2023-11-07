@@ -4,10 +4,7 @@ use std::sync::Arc;
 use scraper::Html;
 
 use super::impls::{self, Impl};
-use crate::item::AssociatedItemKind;
-use crate::parse::style::{Style, StyleModifier};
-use crate::parse::ParseResult;
-use crate::{err, hierarchy, maybe, s};
+use crate::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Field {
@@ -15,12 +12,6 @@ pub struct Field {
     pub definition: Style,
     pub description: Option<Style>,
 }
-
-// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-// pub struct Impl {
-//     pub signature: Style,
-//     pub members: Vec<Member>,
-// }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Member {
@@ -35,6 +26,7 @@ pub struct Member {
 pub struct Struct {
     pub name: Arc<str>,
     pub description: Option<Style>,
+    pub kind: ModuleItemKind,
 
     pub fields: Vec<Field>,
     pub impls: Vec<Impl>,
@@ -49,15 +41,20 @@ pub fn parse(page: &Html) -> ParseResult<Struct> {
         r#"section[id="main-content"]"#
     )?;
 
-    let name = hierarchy!(
+    let head = hierarchy!(
         content;
         r#"div[class="main-heading"]"#,
         "h1",
         r##"a[href="#"]"##,
-    )?
-    .text()
-    .collect::<String>()
-    .into();
+    )?;
+
+    let name = head.text().collect::<String>().into();
+
+    let kind = head
+        .value()
+        .attr("class")
+        .and_then(|class| ModuleItemKind::parse(class))
+        .unwrap_or(ModuleItemKind::Struct);
 
     let description = maybe!(
         content;
@@ -134,6 +131,7 @@ pub fn parse(page: &Html) -> ParseResult<Struct> {
     Ok(Struct {
         name,
         description,
+        kind,
 
         fields,
         impls,

@@ -6,7 +6,6 @@ use thiserror::Error;
 pub mod all_page;
 pub mod crate_page;
 pub mod item;
-pub mod style;
 
 pub type ParseResult<T> = Result<T, ParseError>;
 

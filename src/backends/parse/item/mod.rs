@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use scraper::Html;
 
-use super::style::Style;
 use super::ParseResult;
+use crate::style::Style;
 use crate::item::ModuleItemKind;
 
 mod constant;
