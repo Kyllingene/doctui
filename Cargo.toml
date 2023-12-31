@@ -6,10 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+antsy = "1.1.0"
+cod = { version = "7.3", features = ["input"] }
 dirs = "5.0.1"
 errata = { version = "2.1.0", features = ["color"] }
-ratatui = "0.23.0"
+owo-colors = "4.0.0"
 rustdoc-json = "0.8.7"
-sarge = "4.0.2"
-scraper = "0.17.1"
-thiserror = "1.0.50"
+rustdoc-types = "0.24.0"
+sarge = "7.0"
+serde_json = "1.0.108"
+

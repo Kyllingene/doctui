@@ -1,42 +1,37 @@
-use errata::{FallibleExt, error};
+#![allow(unused_imports)]
+use errata::{error, FallibleExt};
 use sarge::prelude::*;
-use dirs::data_dir;
+use serde_json::from_str;
 
-mod backends;
-pub use backends::parse; // TODO: refactor this out
-mod helper;
-mod item;
-mod link;
-mod prelude;
-mod style;
+mod links;
+mod ui;
 
-pub type Str = std::borrow::Cow<'static, str>;
+sarge! {
+    Args,
+
+    #ok 'f' file: bool,
+}
 
 #[errata::catch]
 fn main() {
-    let parser = ArgumentParser::new();
-    let backend = parser.add(tag::both('b', "backend"));
+    #[allow(unused)]
+    let (_args, files) = Args::parse().fail("failed to parse arguments");
+    let file = files.get(1).fail("you must specify a crate");
 
-    let files = parser.parse().fail("failed to parse arguments");
-    let file = files.get(0).fail("you must specify a file");
-    
-    let mut data_dir = data_dir().unwrap_or_else(|| "./doctui".into());
+    let mut data_dir = dirs::data_dir().unwrap_or_else(|| "./doctui".into());
     data_dir.push("doctui");
     std::fs::create_dir_all(&data_dir).fail("failed to create data directory");
 
-    let docs_path = match backend.get().unwrap_or_else(|_| "json".to_string()).as_str() {
-        "html" => error!("parsing backend not yet complete"),
-        "json" => {
-            rustdoc_json::Builder::default()
-                .toolchain("nightly")
-                .target_dir(&data_dir)
-                .all_features(true)
-                .manifest_path(file)
-                .build()
-                .fail("failed to generate JSON documentation")
-        }
-        back => error!("invalid backend: `{back}`"),
-    };
+    let docs_path = rustdoc_json::Builder::default()
+        .toolchain("nightly")
+        .target_dir(&data_dir)
+        .all_features(true)
+        .manifest_path(file)
+        .build()
+        .fail("failed to generate JSON documentation");
 
-    println!("{}", docs_path.display());
+    let data = std::fs::read_to_string(docs_path).fail("failed to read JSON documentation");
+    let cr = from_str(&data).fail("failed to parse JSON documentation");
+
+    ui::run(&cr);
 }
